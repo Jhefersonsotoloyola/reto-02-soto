@@ -79,6 +79,31 @@ Archivos que genera en `out/`: `sharepoint/maestro-contratos.csv` (copia de trab
 maestro), `sharepoint/Contratos/<año>/<cliente>/…` (documentos archivados),
 `sharepoint/historial.jsonl`, `procesados.json`, `log.jsonl` y `alertas.md`.
 
+## Módulo reutilizable (bonus, sección 9.4)
+
+```
+modulo/
+├── agent.md                              # frontmatter (description, mode: primary, permission edit/bash: deny) + agent/prompt.md
+├── tools/contratos.ts                    # re-exporta src/tools/contratos.ts: las mismas herramientas, sin el servidor
+└── skill/registro-contratos/SKILL.md     # frontmatter (name, description) + src/knowledge/registro-contratos.md
+```
+
+Las tres piezas son las que usa la aplicación, no copias. `agent.md` y `SKILL.md` se generan
+desde `agent/prompt.md` y `src/knowledge/` con `bun run modulo`, y `tests/modulo.test.ts`
+falla si quedaron desactualizados o si las herramientas del módulo no son las mismas de la app.
+
+Para usarlo en otra plataforma de agentes que lea agentes, herramientas y skills en Markdown
+y TypeScript: registra `modulo/agent.md` como agente, `modulo/tools/contratos.ts` como archivo
+de herramientas (cada export se expone como `contratos_<export>`) y la carpeta
+`modulo/skill/registro-contratos/` como skill. Las herramientas reciben
+`ctx = { directory, sessionId }`, con `directory` en la raíz de este repositorio, donde están
+`fixtures/` y donde se escribe `out/`. Ejemplo sin servidor:
+
+```ts
+import * as contratos from "./modulo/tools/contratos"
+const r = await contratos.leer_buzon.execute({}, { directory: process.cwd(), sessionId: "x" })
+```
+
 ## API
 
 | Método | Ruta | Cuerpo / respuesta |
