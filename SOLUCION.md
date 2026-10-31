@@ -78,8 +78,13 @@ usuaria. El front resalta ese estado (respuesta en ámbar y barra con botones **
 salida; lectura de caché US$0.20): procesar el buzón completo son unas 6–7 llamadas al modelo
 con un contexto que crece de ~5 000 a ~25 000 tokens. Con caché: ~90 000 tokens leídos de caché
 (US$0.02) + ~25 000 escritos (US$0.06) + ~6 000 de salida (US$0.06) ≈ **US$0.15 por lote, unos
-US$0.025 por contrato**. Es una estimación: el consumo real de cada sesión queda en
-`tokensSesion` de la respuesta de `/api/chat`.
+US$0.025 por contrato**. El consumo real de cada sesión queda en `tokensSesion` de la
+respuesta de `/api/chat`.
+
+**Medido en el enlace público (2026-10-30):** el prompt de ejemplo del PRD procesó los 6
+mensajes en un turno de unos 20 segundos, con 18 llamadas a herramientas y 58 755 tokens
+procesados en total, incluidos los leídos de caché. La sesión completa (procesar, confirmar
+msg-006 y regenerar alertas) sumó 159 052 tokens en 3 turnos.
 
 ## 5. Estrategia de extracción
 
@@ -179,7 +184,7 @@ y exige `confirmado: true`.
 | `demo.ts` sin modelo | Hecho | 9 chequeos de O1–O4 y RN7. |
 | Bonus `modulo/` | Hecho | Prompt y skill generados de las mismas fuentes; herramientas re-exportadas; prueba de sincronía. |
 | P1 `contratos_leer_pdf` | Hecho, sin prueba con PDF real | Solo PDF con texto; un escaneado se reporta como "necesita OCR". |
-| Link público | Hecho | https://reto-02-soto.onrender.com (Render, plan gratuito). El chat necesita `ANTHROPIC_API_KEY` en el panel de Render. |
+| Link público | Hecho | https://reto-02-soto.onrender.com (Render, plan gratuito). Probado de punta a punta con Claude Sonnet 5.5: prompt del PRD, confirmación de msg-006 y alertas. |
 
 Para producción faltaría: conector real de Exchange/Graph y de SharePoint, OCR para
 escaneados, acuse automático por correo, ejecución programada, persistencia de sesiones y
