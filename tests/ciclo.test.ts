@@ -10,6 +10,7 @@ import { AlmacenSesiones } from "../src/agente/sesiones"
 import { leerMaestro } from "../src/dominio/maestro"
 import { leerLineasJson, rutas } from "../src/lib/archivos"
 import { ErrorProveedor, type ProveedorLLM } from "../src/llm/adapter"
+import { detalleDelProveedor } from "../src/llm/anthropic"
 import * as contratos from "../src/tools/contratos"
 import { proyectoTemporal, ProveedorGuion, RAIZ, respuestaLlamadas, respuestaTexto, turnosDeUsuaria } from "./ayudas"
 
@@ -121,6 +122,13 @@ describe("ciclo del agente", () => {
     expect(primero.reply).toContain("no respondió")
     const segundo = await ejecutarTurno(sesion, "¿sigues ahí?", deps(proveedor))
     expect(segundo.reply).toBe("Ahora sí.")
+  })
+
+  test("CA5: el error de saldo del proveedor llega en español y sin JSON", () => {
+    const cuerpo = { type: "error", error: { type: "invalid_request_error", message: "Your credit balance is too low to access the Anthropic API." } }
+    expect(detalleDelProveedor(cuerpo)).toContain("no tiene saldo")
+    expect(detalleDelProveedor({ error: { message: "max_tokens: too large" } })).toBe("max_tokens: too large")
+    expect(detalleDelProveedor("texto plano")).toBeNull()
   })
 
   test("tope de tokens por sesión", async () => {

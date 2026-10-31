@@ -51,7 +51,7 @@ controlados y verifica los objetivos O1–O4. Termina con código 1 si algún ch
 ## Pruebas
 
 ```bash
-bun test          # 43 pruebas: extracción, reglas RN1–RN7, ciclo del agente, API HTTP, módulo
+bun test          # 44 pruebas: extracción, reglas RN1–RN7, ciclo del agente, API HTTP, módulo
 bun run typecheck # TypeScript estricto, sin any
 ```
 

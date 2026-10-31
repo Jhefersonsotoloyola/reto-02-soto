@@ -47,7 +47,7 @@ Cada commit generado con la asistencia lleva la línea `Co-Authored-By: Claude O
 ```bash
 bun install
 bun run demo.ts     # 6 mensajes, segunda pasada con confirmado: true, alertas, 9 chequeos
-bun test            # 43 pruebas
+bun test            # 44 pruebas
 bun run typecheck   # TypeScript estricto
 git log --format="%h %s%n%b" | grep -c "Co-Authored-By: Claude"   # commits asistidos
 ```

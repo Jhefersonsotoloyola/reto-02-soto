@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { z } from "zod"
 import {
   type DefinicionHerramienta,
   ErrorProveedor,
@@ -52,12 +53,23 @@ function aMotivoFin(stop: Anthropic.Beta.BetaStopReason | null): MotivoFin {
   return "fin"
 }
 
+const CuerpoDeError = z.object({ error: z.object({ message: z.string() }) })
+
+/** El texto que trae la API en el cuerpo del error, sin el JSON alrededor. */
+export function detalleDelProveedor(cuerpo: unknown): string | null {
+  const mensaje = CuerpoDeError.safeParse(cuerpo).data?.error.message ?? null
+  if (mensaje && /credit balance is too low/i.test(mensaje)) {
+    return "la cuenta de Anthropic no tiene saldo. Recarga créditos en console.anthropic.com → Plans & Billing y vuelve a intentar."
+  }
+  return mensaje
+}
+
 function traducirError(error: unknown, timeoutMs: number): ErrorProveedor {
   if (error instanceof Anthropic.APIConnectionTimeoutError) return new ErrorProveedor(`El modelo no respondió en ${Math.round(timeoutMs / 1000)} s. Intenta de nuevo.`)
   if (error instanceof Anthropic.APIConnectionError) return new ErrorProveedor("No hay conexión con el proveedor del modelo. Revisa la red e intenta de nuevo.")
   if (error instanceof Anthropic.AuthenticationError) return new ErrorProveedor("El proveedor rechazó la clave de API configurada en el servidor (ANTHROPIC_API_KEY).")
   if (error instanceof Anthropic.RateLimitError) return new ErrorProveedor("El proveedor está limitando las solicitudes. Espera un minuto e intenta de nuevo.")
-  if (error instanceof Anthropic.BadRequestError) return new ErrorProveedor(`El proveedor rechazó la solicitud: ${error.message}`)
+  if (error instanceof Anthropic.BadRequestError) return new ErrorProveedor(`El proveedor rechazó la solicitud: ${detalleDelProveedor(error.error) ?? error.message}`)
   if (error instanceof Anthropic.APIError) return new ErrorProveedor(`El proveedor respondió con un error (${error.status ?? "sin código"}). Intenta de nuevo en unos minutos.`)
   return new ErrorProveedor(`Error inesperado al llamar al modelo: ${error instanceof Error ? error.message : String(error)}`)
 }

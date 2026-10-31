@@ -202,7 +202,7 @@ Lo que descarté de lo propuesto o considerado durante el desarrollo:
 - **Un "modo demo" con respuestas simuladas del modelo en la app:** lo usé solo para revisar el
   front en local y no lo incluí en el repositorio; la app solo conversa con un modelo real.
 
-Revisé y probé cada módulo (43 pruebas, `demo.ts`, typecheck estricto) y puedo explicar
+Revisé y probé cada módulo (44 pruebas, `demo.ts`, typecheck estricto) y puedo explicar
 cada línea entregada.
 
 ## 11. Riesgos de llevarlo a producción
