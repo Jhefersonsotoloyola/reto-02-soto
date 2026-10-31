@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test"
-import { readFileSync } from "node:fs"
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { leerMaestro } from "../src/dominio/maestro"
 import type { Validacion } from "../src/dominio/validacion"
@@ -142,6 +142,30 @@ describe("errores controlados (HU-6)", () => {
     const v = await validar("msg-otro")
     expect(v.clasificacion).toBe("rechazado")
     expect(v.motivo).toContain("CT-2019-001")
+  })
+})
+
+describe("auditoría contra el PRD", () => {
+  test("HU-6: un correo.json dañado o un PDF dañado no tumban leer_buzon ni alertas", async () => {
+    const carpeta = join(dir, "fixtures", "reto-02", "buzon", "msg-roto")
+    mkdirSync(carpeta, { recursive: true })
+    writeFileSync(join(carpeta, "correo.json"), "{")
+    agregarMensaje(dir, "msg-pdf", { "contrato.pdf": new Uint8Array([1, 2, 3, 4]) })
+    const { mensajes } = datos<{ mensajes: { id: string; clasificacion?: string; motivo?: string }[] }>(await ejecutar(contratos.leer_buzon, {}, dir))
+    expect(mensajes).toHaveLength(8)
+    expect(mensajes.find((m) => m.id === "msg-roto")?.clasificacion).toBe("rechazado")
+    expect(mensajes.find((m) => m.id === "msg-pdf")?.motivo).toContain("dañado")
+    expect((await ejecutar(contratos.alertas, { hoy: "2026-09-03" }, dir)).ok).toBe(true)
+  })
+
+  test("RN2: un contrato sin número reenviado sin cambios es duplicado, no actualización", async () => {
+    const texto = readFileSync(join(dir, "fixtures", "reto-02", "buzon", "msg-002", "contrato.txt"), "utf8").replace(" No. CT-2026-016", "")
+    agregarMensaje(dir, "msg-200", { "contrato.txt": texto })
+    await ejecutar(contratos.registrar, { mensaje_id: "msg-200" }, dir)
+    agregarMensaje(dir, "msg-201", { "contrato.txt": texto })
+    const v = await validar("msg-201")
+    expect(v.clasificacion).toBe("duplicado")
+    expect(v.id_contrato_existente).toBe("AUTO-2026-001")
   })
 })
 

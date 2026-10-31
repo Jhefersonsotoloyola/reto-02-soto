@@ -1,4 +1,4 @@
-import { registrarEnLog } from "../lib/herramienta"
+import { mensajeIdDe, registrarEnLog } from "../lib/herramienta"
 import { leerRespuesta, type RespuestaHerramienta } from "../lib/respuesta"
 import type { LlamadaHerramienta, ProveedorLLM, RespuestaModelo, ResultadoHerramienta, Uso } from "../llm/adapter"
 import type { PoliticaConfirmacion, RevisionPendiente } from "./confirmaciones"
@@ -59,15 +59,15 @@ async function ejecutarLlamada(llamada: LlamadaHerramienta, sesion: Sesion, deps
   const inicio = performance.now()
   const ctx = { directory: deps.directory, sessionId: sesion.id }
   const bloqueo = deps.politica.bloquear(llamada, sesion.pendientes, sesion.turno)
+  const herramienta = deps.herramientas.get(llamada.nombre)
+  // CA4: lo que la herramienta no llega a registrar (bloqueo, nombre desconocido) se registra aquí.
+  const rechazo = bloqueo ?? (herramienta ? null : `herramienta desconocida: ${llamada.nombre}`)
   let contenido: string
-  if (bloqueo) {
-    contenido = JSON.stringify({ ok: false, error: bloqueo })
-    registrarEnLog(ctx, { herramienta: llamada.nombre, mensaje_id: null, ok: false, resumen: bloqueo })
+  if (rechazo || !herramienta) {
+    contenido = JSON.stringify({ ok: false, error: rechazo })
+    registrarEnLog(ctx, { herramienta: llamada.nombre, mensaje_id: mensajeIdDe(llamada.argumentos), ok: false, resumen: rechazo })
   } else {
-    const herramienta = deps.herramientas.get(llamada.nombre)
-    contenido = herramienta
-      ? await herramienta.ejecutar(llamada.argumentos, ctx)
-      : JSON.stringify({ ok: false, error: `herramienta desconocida: ${llamada.nombre}` })
+    contenido = await herramienta.ejecutar(llamada.argumentos, ctx)
   }
   const respuesta = leerSeguro(contenido)
   if (!bloqueo) deps.politica.actualizar(llamada, respuesta, sesion.pendientes, sesion.turno)
@@ -84,9 +84,10 @@ async function ejecutarLlamada(llamada: LlamadaHerramienta, sesion: Sesion, deps
   return { resultado, registro }
 }
 
-function llamadaTruncada(llamada: LlamadaHerramienta) {
+function llamadaTruncada(llamada: LlamadaHerramienta, sesion: Sesion, deps: DependenciasCiclo) {
   const error = "la llamada llegó cortada por el límite de tokens de salida; vuelve a intentarla"
   const contenido = JSON.stringify({ ok: false, error })
+  registrarEnLog({ directory: deps.directory, sessionId: sesion.id }, { herramienta: llamada.nombre, mensaje_id: mensajeIdDe(llamada.argumentos), ok: false, resumen: error })
   const registro: RegistroLlamada = { id: llamada.id, nombre: llamada.nombre, argumentos: llamada.argumentos, ok: false, resumen: error, resultado: contenido, ms: 0 }
   return { resultado: { id: llamada.id, contenido, esError: true }, registro }
 }
@@ -137,7 +138,7 @@ async function bucle(sesion: Sesion, deps: DependenciasCiclo, llamadas: Registro
     for (const llamada of respuesta.llamadas) {
       // Secuencial a propósito: dos registros en paralelo escribirían el mismo maestro.
       alEvento({ tipo: "herramienta_inicio", id: llamada.id, nombre: llamada.nombre, argumentos: llamada.argumentos })
-      const { resultado, registro } = respuesta.fin === "limite_tokens" ? llamadaTruncada(llamada) : await ejecutarLlamada(llamada, sesion, deps)
+      const { resultado, registro } = respuesta.fin === "limite_tokens" ? llamadaTruncada(llamada, sesion, deps) : await ejecutarLlamada(llamada, sesion, deps)
       resultados.push(resultado)
       llamadas.push(registro)
       sesion.eventos.push({ tipo: "herramienta", llamada: registro, ts: ahora() })

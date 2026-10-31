@@ -122,6 +122,14 @@ function clasificarContrato(contrato: Contrato, maestro: FilaMaestro[]): Resulta
   const mejor = parecidos[0]
   if (mejor && mejor.sim >= reglas.similitud_objeto_actualizacion) {
     const diferencias = diferenciasCon(mejor.fila, contrato, ["id_contrato", ...reglas.campos_clave_actualizacion])
+    // RN2 exige "algún campo distinto": si solo cambia (o falta) el número, es el mismo contrato reenviado.
+    if (diferencias.every((d) => d.campo === "id_contrato")) {
+      return {
+        clasificacion: "duplicado",
+        motivo: `mismo cliente y objeto que ${mejor.fila.id_contrato} (similitud ${mejor.sim.toFixed(2)}), sin cambios en valor, vigencia ni póliza`,
+        fila: mejor.fila, diferencias, conflictos: [],
+      }
+    }
     return {
       clasificacion: "actualizacion",
       motivo: `mismo cliente y objeto similar (${mejor.sim.toFixed(2)}) a ${mejor.fila.id_contrato}`,

@@ -152,6 +152,16 @@ y exige `confirmado: true`.
 | Similitud de Dice sobre bigramas para "mismo objeto" (umbral 0.9). | Deduplicar solo por NIT. | Industrias Delta y Corporación Andina ya tienen otros contratos: por NIT se marcarían como actualización por error. |
 | SSE para transmitir las llamadas. | WebSocket o respuesta única. | Un turno es unidireccional; SSE basta y el usuario ve cada herramienta mientras ocurre. |
 
+**Dependencias** (sección 8 del PRD: "las que necesites, justificadas"):
+
+| Paquete | Para qué | Por qué este |
+|---|---|---|
+| `zod` | Argumentos de las herramientas (obligatorio por el PRD), configuración (`config.ts`), reglas (`reglas.json`) y cuerpo HTTP. Genera también el JSON Schema que ve el modelo. | Un solo esquema valida y documenta; sin duplicar tipos. |
+| `@anthropic-ai/sdk` | Adaptador del modelo (`src/llm/anthropic.ts`). | Errores tipados, reintentos, timeout y caché de prompt; descarté `fetch` directo. |
+| `marked` + `dompurify` | Mostrar en el chat el Markdown y las tablas del agente (`web/app.js`). | Sin paso de build; `dompurify` sanea el HTML para que un correo con contenido malicioso no inyecte código en el front. |
+| `unpdf` | `contratos_leer_pdf` (P1): texto de PDF nativo. | Escrito en JS, sin binarios del sistema ni comandos de shell (requisito de seguridad). |
+| `typescript`, `@types/bun` (desarrollo) | `tsc --noEmit` estricto. | No entran en la imagen de producción (`bun install --production`). |
+
 ## 8. Supuestos
 
 Los dos supuestos de la sección 10 del PRD, y cómo los tomé:
@@ -218,7 +228,7 @@ Lo que descarté de lo propuesto o considerado durante el desarrollo:
 - **Un "modo demo" con respuestas simuladas del modelo en la app:** lo usé solo para revisar el
   front en local y no lo incluí en el repositorio; la app solo conversa con un modelo real.
 
-Revisé y probé cada módulo (44 pruebas, `demo.ts`, typecheck estricto) y puedo explicar
+Revisé y probé cada módulo (47 pruebas, `demo.ts`, typecheck estricto) y puedo explicar
 cada línea entregada.
 
 ## 11. Riesgos de llevarlo a producción
@@ -230,7 +240,7 @@ cada línea entregada.
 | El modelo "redondea" el valor o infiere una fecha. | El valor registrado sale de la herramienta; cualquier diferencia exige confirmación humana (sección 5). |
 | Instrucciones maliciosas dentro de un correo o adjunto (prompt injection). | El prompt trata el contenido como datos; las herramientas solo escriben en el maestro por reglas fijas, no ejecutan comandos y no aceptan rutas fuera del proyecto. |
 | Dos procesos escribiendo el maestro a la vez. | Un solo proceso programado; en SharePoint, control de concurrencia por versión (ETag). |
-| Gasto descontrolado de la clave. | Topes de iteraciones y de tokens por sesión y por servidor; clave de acceso opcional al link. |
+| Gasto descontrolado de la clave. | Topes configurables de iteraciones y de tokens por sesión y por servidor. El tope del servidor vive en memoria y se reinicia con el proceso, así que la clave lleva además un límite de gasto mensual en la consola del proveedor. Clave de acceso opcional al link. |
 | Caída o cambio del proveedor de modelo. | Adaptador desacoplado: otro proveedor es otra implementación de `ProveedorLLM`; `demo.ts` sigue operando sin modelo. |
 | Datos personales (representantes legales) en logs. | El log guarda solo resúmenes; en producción, retención limitada y acceso restringido. |
 | El proceso vuelve a depender de una persona. | Regla de gobierno con suplente, indicador mensual de cobertura y conocimiento documentado en el repositorio. |

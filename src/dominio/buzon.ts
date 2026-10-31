@@ -48,8 +48,13 @@ async function leerAdjunto(carpeta: string, nombre: string): Promise<Adjunto> {
   const extension = extname(nombre).toLowerCase()
   let texto: string
   if (extension === ".txt") texto = readFileSync(ruta, "utf8")
-  else if (extension === ".pdf") texto = await textoDePdf(readFileSync(ruta))
-  else return { ...base, error: `formato no soportado: ${extension || "sin extensión"}` }
+  else if (extension === ".pdf") {
+    try {
+      texto = await textoDePdf(readFileSync(ruta))
+    } catch (error) {
+      return { ...base, error: `el PDF ${nombre} está dañado o no se puede leer: ${error instanceof Error ? error.message : String(error)}` }
+    }
+  } else return { ...base, error: `formato no soportado: ${extension || "sin extensión"}` }
   if (texto.trim() === "") return { ...base, texto, error: `el adjunto ${nombre} está vacío o no tiene texto extraíble` }
   return { nombre, ruta, texto, ...tipoDeDocumento(texto), error: null }
 }
@@ -67,7 +72,13 @@ export function leerCorreo(directory: string, mensajeId: string): Correo {
   validarMensajeId(mensajeId)
   const archivoCorreo = join(rutas(directory).buzon, mensajeId, "correo.json")
   if (!existsSync(archivoCorreo)) throw new ErrorProceso(`no existe el mensaje ${mensajeId} en el buzón`)
-  const correo = CorreoSchema.safeParse(leerJson(archivoCorreo))
+  let crudo: unknown
+  try {
+    crudo = leerJson(archivoCorreo)
+  } catch {
+    throw new ErrorProceso(`correo.json de ${mensajeId} no es JSON válido`)
+  }
+  const correo = CorreoSchema.safeParse(crudo)
   if (!correo.success) throw new ErrorProceso(`correo.json de ${mensajeId} no tiene el formato esperado`)
   return correo.data
 }

@@ -31,8 +31,8 @@ otrosí o acta firmada entra por ahí, con o sin póliza.
 
 | Clasificación | Cuándo | Qué se escribe |
 |---|---|---|
-| `duplicado` (RN1) | Mismo `id_contrato` con el mismo `valor`, `fecha_inicio` y `fecha_fin`. También un otrosí cuyos cambios ya están aplicados. | Nada en el maestro. Solo se cierra el mensaje. |
-| `actualizacion` (RN2) | Es un otrosí de un contrato del maestro, o mismo `id_contrato` con algún campo clave distinto, o mismo `nit_cliente` con objeto similar (≥ 0.9). | Se modifica la fila existente y el cambio queda en `historial.jsonl` con el valor anterior y el nuevo. |
+| `duplicado` (RN1) | Mismo `id_contrato` con el mismo `valor`, `fecha_inicio` y `fecha_fin`. También un otrosí cuyos cambios ya están aplicados, o un contrato del mismo cliente con objeto similar (≥ 0.9) sin ningún campo clave distinto. | Nada en el maestro. Solo se cierra el mensaje. |
+| `actualizacion` (RN2) | Es un otrosí de un contrato del maestro, o mismo `id_contrato` con algún campo clave distinto, o mismo `nit_cliente` con objeto similar (≥ 0.9) y algún campo clave distinto. | Se modifica la fila existente y el cambio queda en `historial.jsonl` con el valor anterior y el nuevo. |
 | `nuevo` (RN3) | No hay coincidencia. | Fila nueva en el maestro. |
 | `rechazado` (RN4) | El mensaje no trae contrato (cotización, pregunta), el texto no permite identificar partes ni objeto, o es un otrosí de un contrato que no está en el maestro. | Nada en el maestro. Se cierra el mensaje con el motivo. |
 

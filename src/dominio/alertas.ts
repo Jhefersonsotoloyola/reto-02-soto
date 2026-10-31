@@ -117,6 +117,15 @@ function markdown(a: Alertas, totalContratos: number): string {
   ].join("\n")
 }
 
+/** Un correo ilegible no debe impedir el reporte (HU-6): se lista igual, con su asunto marcado. */
+function asuntoSeguro(directory: string, mensajeId: string): string {
+  try {
+    return leerCorreo(directory, mensajeId).asunto
+  } catch {
+    return "correo ilegible"
+  }
+}
+
 /** HU-5: reporte de riesgos con una fecha de referencia explícita, para que el resultado sea reproducible. */
 export function generarAlertas(directory: string, hoy: string): Alertas {
   if (!esFechaValida(hoy)) throw new ErrorProceso(`fecha "hoy" inválida: ${hoy} (usa YYYY-MM-DD)`)
@@ -134,7 +143,7 @@ export function generarAlertas(directory: string, hoy: string): Alertas {
     registrados_desde_corte: registradosDesdeCorte(directory, maestro),
     pendientes_buzon: listarMensajes(directory)
       .filter((id) => !procesados[id])
-      .map((id) => ({ mensaje_id: id, asunto: leerCorreo(directory, id).asunto })),
+      .map((id) => ({ mensaje_id: id, asunto: asuntoSeguro(directory, id) })),
   }
   escribirArchivo(rutas(directory).alertas, markdown(alertas, maestro.length))
   return alertas

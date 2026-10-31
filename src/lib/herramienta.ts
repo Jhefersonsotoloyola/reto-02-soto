@@ -36,7 +36,7 @@ function textoDeError(error: unknown): string {
   return `error interno: ${error instanceof Error ? error.message : String(error)}`
 }
 
-function mensajeIdDe(args: unknown): string | null {
+export function mensajeIdDe(args: unknown): string | null {
   if (typeof args !== "object" || args === null || !("mensaje_id" in args)) return null
   return typeof args.mensaje_id === "string" ? args.mensaje_id : null
 }

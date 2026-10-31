@@ -90,6 +90,14 @@ describe("ciclo del agente", () => {
     expect(leerMaestro(dir).some((f) => f.id_contrato === "CM-2026-03")).toBe(true)
   })
 
+  test("CA4: una herramienta desconocida también queda en out/log.jsonl", async () => {
+    let paso = 0
+    const proveedor = new ProveedorGuion(() => (++paso === 1 ? respuestaLlamadas(["contratos_inventada", { mensaje_id: "msg-001" }]) : respuestaTexto("ok")))
+    const r = await ejecutarTurno(nuevaSesion(), "prueba", deps(proveedor))
+    expect(r.toolCalls[0]?.ok).toBe(false)
+    expect(leerLineasJson(rutas(dir).log).at(-1)).toMatchObject({ herramienta: "contratos_inventada", mensaje_id: "msg-001", ok: false })
+  })
+
   test("confirmado = true sin una revisión mostrada antes también se bloquea", async () => {
     let paso = 0
     const proveedor = new ProveedorGuion(() => (++paso === 1 ? respuestaLlamadas(["contratos_registrar", { mensaje_id: "msg-006", confirmado: true }]) : respuestaTexto("ok")))

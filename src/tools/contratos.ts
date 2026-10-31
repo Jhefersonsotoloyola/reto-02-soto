@@ -20,31 +20,37 @@ const propuesta = PropuestaContratoSchema.optional().describe(
   "Solo los campos que corriges o que la usuaria dictó; lo que omitas se toma de la extracción. Omítelo para usar la extracción tal cual.",
 )
 
+/** HU-6: un mensaje ilegible (correo.json dañado) se lista como rechazado con su motivo; no impide leer los demás. */
+async function resumenDeMensaje(directory: string, id: string) {
+  try {
+    const mensaje = await leerMensaje(directory, id)
+    const remitente = resolverRemitente(directory, mensaje.correo.de)
+    const motivo = motivoSinContrato(mensaje)
+    return {
+      id,
+      de: mensaje.correo.de,
+      asunto: mensaje.correo.asunto,
+      fecha: mensaje.correo.fecha,
+      adjuntos: mensaje.correo.adjuntos,
+      tiene_contrato: motivo === null,
+      documento: documentoPrincipal(mensaje)?.etiqueta ?? null,
+      comercial: remitente.nombre,
+      remitente_registrado: remitente.conocido,
+      ...(motivo ? { clasificacion: "rechazado", motivo } : {}),
+    }
+  } catch (error) {
+    const motivo = `mensaje ilegible: ${error instanceof Error ? error.message : String(error)}`
+    return { id, de: null, asunto: null, fecha: null, adjuntos: [], tiene_contrato: false, documento: null, comercial: null, remitente_registrado: false, clasificacion: "rechazado", motivo }
+  }
+}
+
 export const leer_buzon = herramienta("contratos_leer_buzon", {
   description: "Lista los mensajes del buzón de contratos aún no procesados, con remitente, asunto, adjuntos y si traen contrato.",
   args: {},
   async run(_args, ctx) {
     const procesados = leerProcesados(ctx.directory)
     const pendientes = listarMensajes(ctx.directory).filter((id) => !procesados[id])
-    const mensajes = await Promise.all(
-      pendientes.map(async (id) => {
-        const mensaje = await leerMensaje(ctx.directory, id)
-        const remitente = resolverRemitente(ctx.directory, mensaje.correo.de)
-        const motivo = motivoSinContrato(mensaje)
-        return {
-          id,
-          de: mensaje.correo.de,
-          asunto: mensaje.correo.asunto,
-          fecha: mensaje.correo.fecha,
-          adjuntos: mensaje.correo.adjuntos,
-          tiene_contrato: motivo === null,
-          documento: documentoPrincipal(mensaje)?.etiqueta ?? null,
-          comercial: remitente.nombre,
-          remitente_registrado: remitente.conocido,
-          ...(motivo ? { clasificacion: "rechazado", motivo } : {}),
-        }
-      }),
-    )
+    const mensajes = await Promise.all(pendientes.map((id) => resumenDeMensaje(ctx.directory, id)))
     const conContrato = mensajes.filter((m) => m.tiene_contrato).length
     return {
       data: { mensajes, ya_procesados: Object.keys(procesados).length },
