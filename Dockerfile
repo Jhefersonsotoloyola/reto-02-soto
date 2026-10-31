@@ -12,6 +12,8 @@ COPY web ./web
 COPY fixtures ./fixtures
 COPY modulo ./modulo
 COPY demo.ts ./
+# La app escribe en /app/out (maestro, historial, log) y el reinicio de la demo lo borra: el usuario bun debe poder hacerlo.
+RUN chown -R bun:bun /app
 
 ENV PORT=3000
 EXPOSE 3000

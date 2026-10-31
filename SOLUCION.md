@@ -179,7 +179,7 @@ y exige `confirmado: true`.
 | `demo.ts` sin modelo | Hecho | 9 chequeos de O1–O4 y RN7. |
 | Bonus `modulo/` | Hecho | Prompt y skill generados de las mismas fuentes; herramientas re-exportadas; prueba de sincronía. |
 | P1 `contratos_leer_pdf` | Hecho, sin prueba con PDF real | Solo PDF con texto; un escaneado se reporta como "necesita OCR". |
-| Link público | Pendiente | Listo para Render (`render.yaml`); falta desplegar con la clave. |
+| Link público | Hecho | https://reto-02-soto.onrender.com (Render, plan gratuito). El chat necesita `ANTHROPIC_API_KEY` en el panel de Render. |
 
 Para producción faltaría: conector real de Exchange/Graph y de SharePoint, OCR para
 escaneados, acuse automático por correo, ejecución programada, persistencia de sesiones y
@@ -189,7 +189,9 @@ autenticación de la analista.
 
 | Herramienta | Para qué |
 |---|---|
-| Claude Code (modelo Claude Opus 5.5), en la app de escritorio de Claude | Leer el PRD y los fixtures, proponer la arquitectura, escribir el código de herramientas, ciclo, adaptador, front y pruebas, ejecutar `demo.ts` y las pruebas, revisar el front en un navegador y redactar borradores de README y de este documento. |
+| Claude Code (modelo Claude Opus 5.5), en la app de escritorio de Claude | Leer el PRD y los fixtures, proponer la arquitectura, escribir el código de herramientas, ciclo, adaptador, front y pruebas, ejecutar `demo.ts` y las pruebas, revisar el front en un navegador, redactar borradores de README y de este documento, publicar el repositorio privado y desplegar en Render. |
+
+El paso a paso (qué pedí, qué hizo la IA y cómo lo verifiqué) está en `docs/bitacora-uso-ia.md`.
 
 Lo que descarté de lo propuesto o considerado durante el desarrollo:
 

@@ -5,7 +5,8 @@ de cada contrato con su confianza, detecta duplicados y otrosíes, registra en e
 archiva el documento y pide confirmación humana antes de registrar algo dudoso. Al final
 genera el reporte de alertas de vencimientos y pólizas.
 
-**Enlace de prueba:** _pendiente de despliegue_ (ver [Despliegue](#despliegue)).
+**Enlace de prueba:** https://reto-02-soto.onrender.com (plan gratuito de Render: si estuvo
+inactivo, la primera carga tarda unos 50 segundos en despertar).
 
 ## Requisitos
 
@@ -100,7 +101,13 @@ Luego: `confirmo el valor 0 y la fecha fin 2027-08-31` (o el botón **Confirmo l
 
 ## Despliegue
 
-El repositorio incluye `Dockerfile` y `render.yaml`. En Render: **New → Blueprint**, elegir
-el repositorio y pegar `ANTHROPIC_API_KEY` (y opcionalmente `ACCESS_KEY`) en el panel.
-Render usa `/api/health` como chequeo de salud. El disco es efímero: `out/` se reinicia en
-cada despliegue y el botón **Reiniciar demo** lo deja como al inicio.
+Desplegado en Render como Web Service con Docker (plan gratuito), desde este repositorio,
+con redespliegue automático en cada push a `main` y `/api/health` como chequeo de salud.
+La clave del modelo se define en Render → servicio → **Environment** → `ANTHROPIC_API_KEY`
+(y opcionalmente `ACCESS_KEY`). También se puede crear con **New → Blueprint** usando
+`render.yaml`. El disco es efímero: `out/` se reinicia en cada despliegue y el botón
+**Reiniciar demo** lo deja como al inicio.
+
+## Uso de IA
+
+Resumen en la sección 10 de `SOLUCION.md`; pasos detallados en `docs/bitacora-uso-ia.md`.
