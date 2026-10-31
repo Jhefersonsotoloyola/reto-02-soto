@@ -44,6 +44,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html, body { height: 100%; }
 
@@ -84,7 +85,7 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--superficie
 .pastilla.ok { background: var(--ok-fondo); color: var(--ok); }
 .pastilla.error { background: var(--error-fondo); color: var(--error); }
 
-.contenido { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 420px; }
+.contenido { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 32vw, 460px); }
 
 .chat { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--borde); }
 .mensajes { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
@@ -102,7 +103,7 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--superficie
 .burbuja p { margin: 0.4rem 0; }
 .burbuja p:first-child { margin-top: 0; }
 .burbuja p:last-child { margin-bottom: 0; }
-.burbuja table { border-collapse: collapse; margin: 0.5rem 0; font-size: 0.88rem; display: block; overflow-x: auto; }
+.burbuja table { border-collapse: collapse; margin: 0.5rem 0; font-size: 0.88rem; display: block; overflow-x: auto; overflow-wrap: normal; }
 .burbuja th, .burbuja td { border: 1px solid var(--borde); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
 .burbuja th { background: var(--superficie-2); }
 .nota { align-self: flex-start; color: var(--texto-suave); font-size: 0.88rem; font-style: italic; max-width: 860px; }
@@ -142,7 +143,8 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--superficie
 .visor { flex: 1; overflow: auto; padding: 0.9rem 1rem; font-size: 0.86rem; }
 .visor .vacio { color: var(--texto-suave); }
 .visor table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
-.visor th, .visor td { border-bottom: 1px solid var(--borde); padding: 0.3rem 0.35rem; text-align: left; vertical-align: top; }
+.visor th, .visor td { border-bottom: 1px solid var(--borde); padding: 0.3rem 0.35rem; text-align: left; vertical-align: top; white-space: nowrap; }
+.visor td:nth-child(2), .visor td:last-child { white-space: normal; min-width: 8rem; }
 .visor th { position: sticky; top: 0; background: var(--superficie); }
 .visor tr.nuevo td { background: var(--ok-fondo); }
 .visor pre { font: 0.76rem/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
@@ -151,7 +153,8 @@ code { font-family: var(--mono); font-size: 0.88em; background: var(--superficie
 .visor h3 { font-size: 0.88rem; }
 
 @media (max-width: 960px) {
-  .contenido { grid-template-columns: 1fr; grid-template-rows: minmax(60vh, 1fr) auto; }
+  .contenido { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(60vh, 1fr) auto; }
+  .barra { padding: 0.6rem 1rem; }
   .chat { border-right: 0; border-bottom: 1px solid var(--borde); }
   .panel { max-height: 70vh; }
   .mensajes, .formulario { padding-left: 1rem; padding-right: 1rem; }

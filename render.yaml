@@ -1,0 +1,16 @@
+# Blueprint de Render: New > Blueprint > este repositorio. La clave del modelo se pega en el panel, no aquí.
+services:
+  - type: web
+    name: registro-contratos
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ACCESS_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: claude-sonnet-5-5
+      - key: MAX_TOKENS_SERVIDOR
+        value: "6000000"

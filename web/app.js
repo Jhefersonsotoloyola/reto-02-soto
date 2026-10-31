@@ -31,8 +31,9 @@ function nuevoIdSesion() {
   return id
 }
 
+const sesionGuardada = leerLocal("sesion")
 const estado = {
-  sesion: leerLocal("sesion") ?? nuevoIdSesion(),
+  sesion: sesionGuardada ?? nuevoIdSesion(),
   clave: leerLocal("clave"),
   ocupado: false,
   pendientes: [],
@@ -416,5 +417,5 @@ for (const boton of document.querySelectorAll(".pestanas button")) {
 }
 
 await revisarSalud()
-await restaurarSesion().catch(() => {})
+if (sesionGuardada) await restaurarSesion().catch(() => {})
 cargarArchivo(estado.archivo)
