@@ -42,7 +42,7 @@ function mensajeIdDe(args: unknown): string | null {
 }
 
 /** RN7: cada ejecución deja una línea en out/log.jsonl. Si el log falla, la herramienta igual responde. */
-function registrarEnLog(ctx: ContextoHerramienta, linea: Record<string, unknown>): void {
+export function registrarEnLog(ctx: ContextoHerramienta, linea: Record<string, unknown>): void {
   try {
     agregarLineaJson(rutas(ctx.directory).log, { ts: new Date().toISOString(), sesion: ctx.sessionId, ...linea })
   } catch {

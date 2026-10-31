@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de Contratos</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">
+      <span class="logo" aria-hidden="true">▤</span>
+      <div>
+        <h1>Registro de Contratos Vigentes</h1>
+        <p>Agente del buzón único · reto 02</p>
+      </div>
+    </div>
+    <div class="acciones">
+      <span id="estado" class="pastilla">conectando…</span>
+      <button id="nueva" type="button" class="secundario">Nueva sesión</button>
+      <button id="reiniciar" type="button" class="secundario" title="Borra out/ y las sesiones: el maestro vuelve a su estado del 2026-05-30">Reiniciar demo</button>
+    </div>
+  </header>
+
+  <main class="contenido">
+    <section class="chat" aria-label="Conversación">
+      <div id="mensajes" class="mensajes" aria-live="polite">
+        <div id="bienvenida" class="bienvenida">
+          <h2>Procesa el buzón de contratos</h2>
+          <p>El agente lee los correos de <code>contratos@periferia-ficticia.com</code>, extrae cada contrato, detecta duplicados y otrosíes, lo registra en el maestro y te pide confirmación cuando algo es dudoso.</p>
+          <button id="ejemplo" type="button" class="sugerencia">Usar el prompt de ejemplo del PRD</button>
+        </div>
+      </div>
+
+      <div id="confirmacion" class="confirmacion" hidden>
+        <div>
+          <strong>El agente espera tu confirmación</strong>
+          <ul id="pendientes"></ul>
+        </div>
+        <div class="botones">
+          <button id="confirmar" type="button">Confirmo los valores propuestos</button>
+          <button id="corregir" type="button" class="secundario">Corregir un valor</button>
+        </div>
+      </div>
+
+      <form id="formulario" class="formulario">
+        <textarea id="entrada" rows="2" placeholder="Escribe una instrucción, por ejemplo: procesa el buzón con fecha de hoy 2026-09-03" required></textarea>
+        <button id="enviar" type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <aside class="panel" aria-label="Archivos generados">
+      <div class="pestanas" role="tablist">
+        <button type="button" role="tab" data-archivo="alertas" aria-selected="true">Alertas</button>
+        <button type="button" role="tab" data-archivo="maestro" aria-selected="false">Maestro</button>
+        <button type="button" role="tab" data-archivo="historial" aria-selected="false">Historial</button>
+        <button type="button" role="tab" data-archivo="log" aria-selected="false">Log</button>
+      </div>
+      <div id="visor" class="visor" role="tabpanel"></div>
+    </aside>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

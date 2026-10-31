@@ -104,7 +104,9 @@ export async function registrarMensaje(
   const v = await validarMensaje(directory, mensajeId, propuesta)
   if (v.requiere_revision.length > 0 && !confirmado) {
     const detalle = v.detalle_revision.map((d) => `${d.campo} = ${JSON.stringify(d.valor_propuesto)} (${d.motivo})`).join("; ")
-    throw new ErrorProceso(`requiere revisión: ${detalle}. Pregunta a la usuaria y, solo si confirma, vuelve a llamar con confirmado=true.`)
+    throw new ErrorProceso(
+      `requiere revisión: ${v.requiere_revision.join(", ")} — ${detalle}. Pregunta a la usuaria y, solo si confirma, vuelve a llamar con confirmado=true.`,
+    )
   }
 
   let accion: Accion = v.clasificacion === "rechazado" ? "rechazado" : "sin_cambios"
