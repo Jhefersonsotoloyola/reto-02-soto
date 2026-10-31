@@ -1,0 +1,74 @@
+{
+  "umbral_confianza": 0.8,
+  "dias_alerta_vencimiento": 60,
+  "fecha_corte_maestro": "2026-05-30",
+  "similitud_objeto_actualizacion": 0.9,
+  "empresa_propia": {
+    "razon_social": "PERIFERIA IT GROUP S.A.S.",
+    "identificador": "900123456"
+  },
+  "campos_obligatorios": [
+    "cliente",
+    "nit_cliente",
+    "pais",
+    "objeto",
+    "valor",
+    "moneda",
+    "fecha_inicio",
+    "fecha_fin",
+    "requiere_poliza"
+  ],
+  "campos_clave_actualizacion": [
+    "valor",
+    "moneda",
+    "fecha_inicio",
+    "fecha_fin",
+    "requiere_poliza",
+    "tipo_poliza"
+  ],
+  "identificadores": [
+    { "etiqueta": "RUC", "patron": "^\\d{10}001$", "pais": "EC" },
+    { "etiqueta": "RUC", "patron": "^(10|15|17|20)\\d{9}$", "pais": "PE" },
+    { "etiqueta": "RUC", "patron": "^[\\d-]{6,20}$", "pais": "PA" },
+    { "etiqueta": "RTN", "patron": "^\\d{14}$", "pais": "HN" },
+    { "etiqueta": "NIT", "patron": "^\\d{9,10}$", "pais": "CO" }
+  ],
+  "lugares_por_pais": {
+    "CO": ["colombia", "bogota", "medellin", "barranquilla", "cali", "cartagena", "bucaramanga", "pereira"],
+    "EC": ["ecuador", "quito", "guayaquil", "cuenca"],
+    "PE": ["peru", "lima", "arequipa", "trujillo"],
+    "PA": ["panama", "colon", "david"],
+    "HN": ["honduras", "tegucigalpa", "san pedro sula"]
+  },
+  "moneda_por_pais": {
+    "CO": "COP",
+    "EC": "USD",
+    "PE": "PEN",
+    "PA": "USD",
+    "HN": "HNL"
+  },
+  "palabras_moneda": {
+    "COP": ["pesos", "m/cte"],
+    "USD": ["dolares"],
+    "PEN": ["soles"],
+    "PAB": ["balboas"],
+    "HNL": ["lempiras"]
+  },
+  "tipos_poliza": {
+    "cumplimiento": ["cumplimiento"],
+    "calidad": ["calidad"],
+    "salarios_prestaciones": ["salarios", "prestaciones sociales"],
+    "responsabilidad_civil": ["responsabilidad civil"],
+    "estabilidad": ["estabilidad"],
+    "anticipo": ["anticipo"],
+    "seriedad": ["seriedad de la oferta"]
+  },
+  "patrones_valor_indeterminado": [
+    "no tiene un valor determinado",
+    "valor indeterminado",
+    "cuantia indeterminada",
+    "por demanda"
+  ],
+  "sufijos_societarios": ["s.a.s.", "s.a.c.", "s.a.", "s. de r.l.", "ltda.", "ltda", "s.r.l.", "e.i.r.l.", "s.c.s."],
+  "otrosi_que_extiende_plazo_deja_poliza_pendiente": true
+}
