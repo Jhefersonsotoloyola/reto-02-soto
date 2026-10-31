@@ -145,9 +145,9 @@ describe("API HTTP", () => {
   const config = leerConfig({ MAX_ITERACIONES: "5" })
 
   test("health no expone la clave y el chat sin proveedor responde 503", async () => {
-    const app = crearApp({ raiz: dir, config: leerConfig({ ANTHROPIC_API_KEY: "sk-ant-secreta" }), proveedor: null })
+    const app = crearApp({ raiz: dir, config: leerConfig({ ANTHROPIC_API_KEY: "clave-falsa-de-prueba" }), proveedor: null })
     const salud = await (await app.fetch(new Request("http://x/api/health"))).text()
-    expect(salud).not.toContain("sk-ant")
+    expect(salud).not.toContain("clave-falsa")
     const chat = await app.fetch(new Request("http://x/api/chat", { method: "POST", body: JSON.stringify({ sessionId: "abcdefgh", message: "hola" }) }))
     expect(chat.status).toBe(503)
   })

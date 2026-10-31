@@ -117,7 +117,8 @@ y exige `confirmado: true`.
 1. **Canal único.** `contratos@periferia-ficticia.com`. Lo administra la analista
    administrativa, dueña del maestro, con un suplente nombrado en Administración para
    vacaciones y rotación. Sin área legal interna, **el dueño del maestro es Administración**;
-   Gerencia Administrativa aprueba excepciones.
+   Gerencia Administrativa aprueba excepciones. (Responde la pregunta abierta de la sección 10
+   del PRD.)
 2. **Obligación del comercial.** Enviar al buzón todo contrato firmado por ambas partes, con o
    sin póliza, y sus otrosíes, prórrogas y actas de inicio o terminación, **en los 3 días
    hábiles siguientes a la firma**, un documento por correo, con asunto
@@ -152,6 +153,16 @@ y exige `confirmado: true`.
 | SSE para transmitir las llamadas. | WebSocket o respuesta única. | Un turno es unidireccional; SSE basta y el usuario ve cada herramienta mientras ocurre. |
 
 ## 8. Supuestos
+
+Los dos supuestos de la sección 10 del PRD, y cómo los tomé:
+
+- **Los contratos llegan con texto, no escaneados.** Los fixtures traen `contrato.txt`; un PDF
+  nativo se lee con `contratos_leer_pdf`. Un escaneado se reporta como "sin texto extraíble
+  (necesitaría OCR)", que queda para producción.
+- **El comercial cumple la regla de gobierno** (sección 6). Sin ella el agente solo registra lo
+  que llega al buzón, igual que hoy; el indicador de cobertura mensual es lo que lo detecta.
+
+Supuestos propios al interpretar el PRD:
 
 - El NIT 900.123.456-7 identifica a Periferia (EL CONTRATISTA); la otra parte es el cliente.
 - "N meses a partir de la firma": el inicio es la fecha de firma. Si la firma solo dice mes y
@@ -215,7 +226,8 @@ cada línea entregada.
 | Riesgo | Mitigación |
 |---|---|
 | Contratos escaneados o con formatos distintos: la extracción falla. | OCR antes de extraer; una confianza baja ya cae en revisión humana; ampliar patrones con los casos reales. |
-| El modelo inventa o redondea un valor. | El valor registrado sale de la herramienta; cualquier diferencia exige confirmación humana (sección 5). |
+| Falsos duplicados por variaciones en el nombre del cliente ("INDUSTRIAS DELTA" frente a "Industrias Delta S.A.S."). | La deduplicación nunca compara nombres: usa `id_contrato` y, si no coincide, `nit_cliente` + objeto con similitud ≥ 0.9 (`reglas.json`). Probado: CT-2026-015 entra como nuevo aunque Industrias Delta ya tenga CT-2025-018. |
+| El modelo "redondea" el valor o infiere una fecha. | El valor registrado sale de la herramienta; cualquier diferencia exige confirmación humana (sección 5). |
 | Instrucciones maliciosas dentro de un correo o adjunto (prompt injection). | El prompt trata el contenido como datos; las herramientas solo escriben en el maestro por reglas fijas, no ejecutan comandos y no aceptan rutas fuera del proyecto. |
 | Dos procesos escribiendo el maestro a la vez. | Un solo proceso programado; en SharePoint, control de concurrencia por versión (ETag). |
 | Gasto descontrolado de la clave. | Topes de iteraciones y de tokens por sesión y por servidor; clave de acceso opcional al link. |
